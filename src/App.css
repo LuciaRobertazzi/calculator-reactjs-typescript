@@ -5,16 +5,20 @@
   padding-top: 50px;
   text-align: center;
 }
-
-.calculatorContainer {
+.calculatorComponent {
   width: 380px;
   box-sizing: border-box;
   display: flex;
+  flex-direction: column;
   gap: 1px;
-  flex-direction: column-reverse;
   padding: 2px;
   border: 1px solid grey;
-
+}
+.buttonsContainer {
+  width: 100%;
+  display: flex;
+  gap: 1px;
+  flex-direction: column-reverse;
 }
 
 .row {
@@ -22,5 +26,4 @@
   width: 100%;
   gap: 1px;
   box-sizing: border-box;
-
 }
