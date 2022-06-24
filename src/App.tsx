@@ -1,24 +1,42 @@
 import React from 'react';
-import logo from './logo.svg';
+import ActionButton from './components/UI/ActionButton';
 import './App.css';
+import contentArray from './constants/content';
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className='App'>
+      <div className='calculatorContainer'>
+        {contentArray.map(
+          (row: {
+            row: number;
+            content: {
+              type: 'number' | 'operation';
+              value: string;
+              operation:
+                | 'plus'
+                | 'minus'
+                | 'multiply'
+                | 'divide'
+                | 'delete'
+                | 'clear'
+                | 'calculate'
+                | 'number';
+            }[];
+          }) => (
+            <div key={row.row} className='row'>
+              {row.content.map((button) => (
+                <ActionButton
+                key={button.value}
+                  buttonType={button.type}
+                  value={button.value}
+                  onClick={() => console.log(button.operation)}
+                />
+              ))}
+            </div>
+          )
+        )}
+      </div>
     </div>
   );
 }
