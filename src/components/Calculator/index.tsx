@@ -9,7 +9,6 @@ type operationsType =
   | "minus"
   | "multiply"
   | "divide"
-  | "delete"
   | "clear"
   | "calculate"
   | "number";
@@ -25,74 +24,75 @@ interface stateInterface {
     | {};
 }
 
+// type calculateOperatorType = Omit<operationsType, "number" | "calculate">;
+
 const calculateFunction = ({
   currentValue,
   previousValue,
   operator,
-}: { currentValue: string;
+}: {
+  currentValue: string;
   previousValue: string;
-  operator:{
-        value: string;
-        type: operationsType;
-      }}): stateInterface => {
-        console.log("Vainilla");
-        
+  operator: {
+    value: string;
+    type: operationsType;
+  };
+}): stateInterface => {
   const chooseOperation: {
     plus: stateInterface;
     clear: stateInterface;
-    calculate: stateInterface;
     minus: stateInterface;
     multiply: stateInterface;
     divide: stateInterface;
-    delete: stateInterface;
-    number: stateInterface;
   } = {
     plus: {
-      currentValue: `${previousValue + currentValue}`,
+      currentValue: `${
+        parseInt(previousValue, 10) + parseInt(currentValue, 10)
+      }`,
       previousValue: "",
-      operator,
+      operator: {},
     },
     clear: {
       currentValue: "",
       previousValue: "",
       operator: {},
     },
-    calculate: {
-      currentValue: "",
-      previousValue: "",
-      operator: {},
-    },
     minus: {
-      currentValue: "",
+      currentValue: `${
+        parseInt(previousValue, 10) - parseInt(currentValue, 10)
+      }`,
       previousValue: "",
       operator,
     },
     multiply: {
-      currentValue: "",
+      currentValue: `${
+        parseInt(previousValue, 10) * parseInt(currentValue, 10)
+      }`,
       previousValue: "",
       operator,
     },
     divide: {
-      currentValue: "",
-      previousValue: "",
-      operator,
-    },
-    delete: {
-      currentValue: "",
-      previousValue: "",
-      operator,
-    },
-    number: {
-      currentValue: "",
+      currentValue: `${
+        parseInt(previousValue, 10) / parseInt(currentValue, 10)
+      }`,
       previousValue: "",
       operator,
     },
   };
-  console.log(operator?.type);
-
-  return operator?.type !== undefined ? chooseOperation[operator.type] : {currentValue, previousValue, operator};
-  // return {currentValue, previousValue, operator};
-
+// if (operator.type !== undefined && currentValue && previousValue ) {
+  
+//   return chooseOperation[operator.type as "plus" | "clear" | "minus" | "multiply" | "divide"]
+// }
+// if (operator.type !== undefined && operator.type === "clear") {
+  
+//   return chooseOperation[operator.type as "plus" | "clear" | "minus" | "multiply" | "divide"]
+// }
+// return { currentValue, previousValue, operator }
+  return ((operator?.type !== undefined && currentValue && previousValue) ||
+    operator.type === "clear")
+    // temporary solution until type correctly
+    ? chooseOperation[operator.type as "plus" | "clear" | "minus" | "multiply" | "divide"]
+    : { currentValue, previousValue, operator }
 };
 
 const manageCalculator: (
@@ -107,32 +107,47 @@ const manageCalculator: (
   {
     type,
     payload,
-  }: {
-    type: "number" | "operation";
-    payload:
-      | {
+  }:
+    | {
+        type: "number";
+        payload: string;
+      }
+    | {
+        type: "operation";
+        payload: {
           value: string;
           type: operationsType;
-        }
-      | string;
-  }
+        };
+      }
 ) => any = (state, { type, payload }) => {
   const actions: {
     number: stateInterface;
     operation: stateInterface;
   } = {
-    number: { ...state, currentValue: `${state.currentValue}${payload}` },
-    operation: calculateFunction({
+    number: {
       ...state,
-      operator: payload as {
-        value: string;
-        type: operationsType;
-      }
-    }),
+      currentValue:
+        state.currentValue === "0"
+          ? `${payload !== "0" ? payload : "0"}`
+          : `${state.currentValue}${payload}`,
+    },
+    operation:
+      (typeof payload === "object" && payload?.type === "clear")
+        ? calculateFunction({ ...state, operator: payload })
+        : {
+            previousValue: `${
+              state.previousValue === "" && state.currentValue !== ""
+                ? state.currentValue
+                : state.previousValue
+            }`,
+            currentValue: "",
+            operator: payload,
+          },
   };
-  console.log(type);
   
-  return actions[type];
+  return type === "operation" && payload.type === "calculate"
+    ? calculateFunction(state)
+    : actions[type];
 };
 
 const Calculator = () => {
@@ -144,10 +159,7 @@ const Calculator = () => {
       operator: {},
     }
   );
-React.useEffect(()=>{
-  console.log("chocolate", { currentValue, previousValue, operator });
-  
-},[currentValue, previousValue, operator])
+
   return (
     <Container general>
       <Visor
@@ -172,13 +184,20 @@ React.useEffect(()=>{
                   buttonType={button.type}
                   value={button.value}
                   onClick={() =>
-                    dispatch({
-                      type: button.type,
-                      payload:
-                        button.type === "operation"
-                          ? { value: button.value, type: button.operation }
-                          : button.value,
-                    })
+                    dispatch(
+                      button.type === "number" && button.operation !== "clear"
+                        ? {
+                            type: "number",
+                            payload: button.value,
+                          }
+                        : {
+                            type: "operation",
+                            payload: {
+                              type: button.operation,
+                              value: button.value,
+                            },
+                          }
+                    )
                   }
                 />
               ))}

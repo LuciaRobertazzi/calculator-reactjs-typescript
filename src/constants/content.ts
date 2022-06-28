@@ -8,7 +8,6 @@ const contentArray: {
       | 'minus'
       | 'multiply'
       | 'divide'
-      | 'delete'
       | 'clear'
       | 'calculate'
       | 'number';
