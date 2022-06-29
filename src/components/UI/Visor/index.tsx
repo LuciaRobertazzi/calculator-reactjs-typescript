@@ -11,7 +11,7 @@ const Visor = ({ currentValue, previousValue, operator }: VisorInterface) => {
       {previousValue && (
         <>
           <Text>{previousValue}</Text>
-          {operator && <Text>{operator}</Text>}
+          {operator && <Text dangerouslySetInnerHTML={{ __html: `${operator}` }}/>}
         </>
       )}
       <Text currentValue>{currentValue}</Text>

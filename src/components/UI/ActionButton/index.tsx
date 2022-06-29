@@ -13,9 +13,7 @@ const ActionButton = ({
   buttonType,
 }: ActionButtonInterface) => {
   return (
-    <Button onClick={onClick} buttonType={buttonType}>
-      {value}
-    </Button>
+    <Button onClick={onClick} buttonType={buttonType} dangerouslySetInnerHTML={{ __html: `${value}` }} />
   );
 };
 

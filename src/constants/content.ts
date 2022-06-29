@@ -98,7 +98,7 @@ const contentArray: {
       },
       {
         type: 'operation',
-        value: 'x',
+        value: '&times;',
         operation: 'multiply',
       },
     ],
