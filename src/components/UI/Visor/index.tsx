@@ -8,7 +8,7 @@ interface VisorInterface {
 const Visor = ({ currentValue, previousValue, operator }: VisorInterface) => {
   return (
     <VisorComponent>
-      {previousValue && (
+      {previousValue && currentValue === "" && (
         <>
           <Text>{previousValue}</Text>
           {operator && <Text dangerouslySetInnerHTML={{ __html: `${operator}` }}/>}

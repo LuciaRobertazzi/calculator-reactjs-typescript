@@ -107,7 +107,7 @@ const contentArray: {
     row: 5,
     content: [
       {
-        type: 'number',
+        type: 'operation',
         value: 'c',
         operation: 'clear',
       },

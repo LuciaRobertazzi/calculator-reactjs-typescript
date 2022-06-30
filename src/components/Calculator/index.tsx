@@ -53,7 +53,7 @@ const calculateFunction = ({
       operator: {},
     },
     clear: {
-      currentValue: "",
+      currentValue: "0",
       previousValue: "",
       operator: {},
     },
@@ -79,20 +79,22 @@ const calculateFunction = ({
       operator,
     },
   };
-// if (operator.type !== undefined && currentValue && previousValue ) {
-  
-//   return chooseOperation[operator.type as "plus" | "clear" | "minus" | "multiply" | "divide"]
-// }
-// if (operator.type !== undefined && operator.type === "clear") {
-  
-//   return chooseOperation[operator.type as "plus" | "clear" | "minus" | "multiply" | "divide"]
-// }
-// return { currentValue, previousValue, operator }
-  return ((operator?.type !== undefined && currentValue && previousValue) ||
-    operator.type === "clear")
-    // temporary solution until type correctly
-    ? chooseOperation[operator.type as "plus" | "clear" | "minus" | "multiply" | "divide"]
-    : { currentValue, previousValue, operator }
+  // if (operator.type !== undefined && currentValue && previousValue ) {
+
+  //   return chooseOperation[operator.type as "plus" | "clear" | "minus" | "multiply" | "divide"]
+  // }
+  // if (operator.type !== undefined && operator.type === "clear") {
+
+  //   return chooseOperation[operator.type as "plus" | "clear" | "minus" | "multiply" | "divide"]
+  // }
+  // return { currentValue, previousValue, operator }
+  return (operator?.type !== undefined && currentValue && previousValue) ||
+    operator.type === "clear"
+    ? // temporary solution until type correctly
+      chooseOperation[
+        operator.type as "plus" | "clear" | "minus" | "multiply" | "divide"
+      ]
+    : { currentValue, previousValue, operator };
 };
 
 const manageCalculator: (
@@ -132,7 +134,8 @@ const manageCalculator: (
           : `${state.currentValue}${payload}`,
     },
     operation:
-      (typeof payload === "object" && payload?.type === "clear")
+      typeof payload === "object" &&
+      (payload?.type === "clear" || payload?.type === "calculate")
         ? calculateFunction({ ...state, operator: payload })
         : {
             previousValue: `${
@@ -144,7 +147,7 @@ const manageCalculator: (
             operator: payload,
           },
   };
-  
+
   return type === "operation" && payload.type === "calculate"
     ? calculateFunction(state)
     : actions[type];
@@ -154,7 +157,7 @@ const Calculator = () => {
   const [{ currentValue, previousValue, operator }, dispatch] = useReducer(
     manageCalculator,
     {
-      currentValue: "",
+      currentValue: "0",
       previousValue: "",
       operator: {},
     }
@@ -181,11 +184,13 @@ const Calculator = () => {
               {row.content.map((button) => (
                 <ActionButton
                   key={button.value}
-                  buttonType={button.type}
+                  buttonType={
+                    button.operation === "clear" ? "number" : button.type
+                  }
                   value={button.value}
                   onClick={() =>
                     dispatch(
-                      button.type === "number" && button.operation !== "clear"
+                      button.type === "number"
                         ? {
                             type: "number",
                             payload: button.value,
